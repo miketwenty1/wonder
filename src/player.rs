@@ -24,7 +24,8 @@ impl Plugin for PlayerPlugin {
         app.add_startup_system_to_stage(StartupStage::PostStartup, player_spawn_system)
             .add_system(player_movement_system)
             .add_system(player_keyboard_event_system)
-            .add_system(animate_sprite_system);
+            .add_system(animate_sprite_system)
+            .add_system(camera_follow);
     }
 }
 
@@ -54,7 +55,7 @@ fn player_spawn_system(mut commands: Commands, game_textures: Res<GameTextures>)
             flipx_animation_r: false,
         })
         .insert(Velocity { x: 0., y: 0. })
-        .insert(AnimationTimer(Timer::from_seconds(0.2, true)));
+        .insert(AnimationTimer(Timer::from_seconds(0.15, true)));
 }
 
 fn player_movement_system(
@@ -211,4 +212,15 @@ fn animate_sprite_system(
             }
         }
     }
+}
+
+fn camera_follow(
+    mut camera_query: Query<&mut Transform, (With<Camera>, Without<Player>)>,
+    player_query: Query<(&Player, &Transform)>,
+) {
+    let mut cam_transform = camera_query.single_mut();
+    let (_, player_transform) = player_query.single();
+
+    cam_transform.translation.x = player_transform.translation.x;
+    cam_transform.translation.y = player_transform.translation.y;
 }

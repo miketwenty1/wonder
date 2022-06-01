@@ -1,5 +1,6 @@
 //#![allow(clippy::redundant_field_names)]
 use bevy::{prelude::*, window::PresentMode};
+use block::BlockPlugin;
 use debug::DebugPlugin;
 use player::PlayerPlugin;
 //render::camera::ScalingMode
@@ -17,11 +18,10 @@ pub struct WinSize {
     pub h: f32,
 }
 
-//pub struct HandyboySpriteSheet(Handle<TextureAtlas>);
-
 struct GameTextures {
     player: Handle<TextureAtlas>,
 }
+mod block;
 mod components;
 mod debug;
 mod player;
@@ -43,6 +43,7 @@ fn main() {
         })
         .add_plugins(DefaultPlugins)
         .add_plugin(PlayerPlugin)
+        .add_plugin(BlockPlugin)
         .add_startup_system(setup_system)
         .add_startup_system_to_stage(StartupStage::PreStartup, spritesheet_system)
         //.add_startup_system_to_stage(StartupStage::PostStartup, player_spawn_system)
@@ -91,20 +92,3 @@ fn spritesheet_system(
     };
     commands.insert_resource(game_textures);
 }
-
-// struct ManSheet(Handle<TextureAtlas>);
-
-// fn load_character_sprites(
-//     mut commands: Commands,
-//     assets: Res<AssetServer>,
-//     mut texture_atlases: ResMut<Assets<TextureAtlas>>,
-// ) {
-//     let image = assets.load("mansprite.png");
-
-//     let atlas =
-//         TextureAtlas::from_grid_with_padding(image, Vec2::splat(32.0), 3, 1, Vec2::splat(0.0));
-
-//     let atlas_handle = texture_atlases.add(atlas);
-
-//     commands.insert_resource(atlas_handle);
-// }
