@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 use bevy_inspector_egui::{RegisterInspectable, WorldInspectorPlugin};
 
+use crate::components::Block;
 use crate::components::Player;
 use crate::components::Velocity;
 
@@ -11,6 +12,7 @@ impl Plugin for DebugPlugin {
         if cfg!(debug_assertions) {
             app.add_plugin(WorldInspectorPlugin::new())
                 .register_inspectable::<Player>()
+                .register_inspectable::<Block>()
                 .register_inspectable::<Velocity>();
         }
     }

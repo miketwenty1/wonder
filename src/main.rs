@@ -12,7 +12,7 @@ pub const SPRITESHEET_SIZE: (f32, f32) = (96.0, 32.0);
 pub const SPRITE_SCALE: f32 = 4.;
 
 const TIME_STEP: f32 = 1. / 60.;
-const BASE_SPEED: f32 = 200.;
+const BASE_SPEED: f32 = 600.;
 pub struct WinSize {
     pub w: f32,
     pub h: f32,

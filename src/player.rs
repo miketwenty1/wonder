@@ -1,10 +1,21 @@
 use bevy::prelude::*;
-use bevy_inspector_egui::Inspectable;
+use bevy_inspector_egui::{Inspectable, RegisterInspectable};
 
 use crate::{
     components::{Player, Velocity},
     GameTextures, BASE_SPEED, SPRITE_SCALE, TIME_STEP,
 };
+
+#[derive(Clone, Debug)]
+pub enum Edge {
+    North,
+    South,
+    East,
+    West,
+}
+
+#[derive(Clone, Debug)]
+pub struct EdgeEvent(pub Edge);
 
 #[derive(Component, Inspectable)]
 pub enum Direction {
@@ -22,10 +33,12 @@ pub struct PlayerPlugin;
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
         app.add_startup_system_to_stage(StartupStage::PostStartup, player_spawn_system)
+            .add_event::<EdgeEvent>()
             .add_system(player_movement_system)
             .add_system(player_keyboard_event_system)
             .add_system(animate_sprite_system)
             .add_system(camera_follow);
+        //.register_inspectable::<EdgeEvent>();
     }
 }
 
@@ -60,6 +73,7 @@ fn player_spawn_system(mut commands: Commands, game_textures: Res<GameTextures>)
 
 fn player_movement_system(
     mut query: Query<(&Velocity, &mut Transform, &mut Player), With<Player>>,
+    mut edge_event: EventWriter<EdgeEvent>,
 ) {
     for (velocity, mut transform, mut player) in query.iter_mut() {
         let translation = &mut transform.translation;
@@ -77,6 +91,35 @@ fn player_movement_system(
         if velocity.y < 0. {
             player.direction = Direction::Down;
         }
+
+        // let mut edge_x = false;
+        // let mut edge_y = false;
+
+        if translation.x > 265. {
+            edge_event.send(EdgeEvent(Edge::East));
+            translation.x = -250.
+        }
+        if translation.x < -265. {
+            edge_event.send(EdgeEvent(Edge::West));
+            translation.x = 250.
+        }
+        if translation.y > 265. {
+            edge_event.send(EdgeEvent(Edge::North));
+            translation.y = -250.
+        }
+        if translation.y < -265. {
+            edge_event.send(EdgeEvent(Edge::South));
+            translation.y = 250.
+        }
+        // only reflect if the ball's velocity is going in the opposite direction of the
+        // collision
+        // match translation.x,translation.y {
+        //     Collision::Left => reflect_x = ball_velocity.x > 0.0,
+        //     Collision::Right => reflect_x = ball_velocity.x < 0.0,
+        //     Collision::Top => reflect_y = ball_velocity.y < 0.0,
+        //     Collision::Bottom => reflect_y = ball_velocity.y > 0.0,
+        //     Collision::Inside => { /* do nothing */ }
+        // }
     }
 }
 

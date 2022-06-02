@@ -1,5 +1,6 @@
 use bevy::prelude::Component;
 use bevy_inspector_egui::Inspectable;
+// use ulam::Coord;
 
 use crate::player::Direction;
 
@@ -21,3 +22,17 @@ pub struct Player {
     pub flipx_animation_l: bool,
     pub flipx_animation_r: bool,
 }
+
+#[derive(Component, Inspectable)]
+pub struct Block {
+    pub size: f32,
+    pub num: i32,
+    pub x: i32,
+    pub y: i32,
+}
+
+#[derive(Default, Inspectable)]
+struct CollisionEvent;
+
+#[derive(Default, Inspectable)]
+struct Collider;
