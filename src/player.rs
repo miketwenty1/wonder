@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use bevy_inspector_egui::{Inspectable, RegisterInspectable};
+use bevy_inspector_egui::Inspectable; //, RegisterInspectable};
 
 use crate::{
     components::{Player, Velocity},

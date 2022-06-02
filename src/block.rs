@@ -1,6 +1,6 @@
 use bevy::prelude::*; //text::Text2dBounds};
-use bevy::sprite::collide_aabb::{collide, Collision};
-use bevy_inspector_egui::Inspectable;
+                      //use bevy::sprite::collide_aabb::{collide, Collision};
+                      //use bevy_inspector_egui::Inspectable;
 use ulam::{self, Coord};
 
 use crate::components::Block;
