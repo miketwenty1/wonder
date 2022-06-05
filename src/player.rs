@@ -257,13 +257,13 @@ fn animate_sprite_system(
     }
 }
 
-fn camera_follow(
-    mut camera_query: Query<&mut Transform, (With<Camera>, Without<Player>)>,
-    player_query: Query<(&Player, &Transform)>,
-) {
-    let mut cam_transform = camera_query.single_mut();
-    let (_, player_transform) = player_query.single();
+// fn camera_follow(
+//     mut camera_query: Query<&mut Transform, (With<Camera>, Without<Player>)>,
+//     player_query: Query<(&Player, &Transform)>,
+// ) {
+//     let mut cam_transform = camera_query.single_mut();
+//     let (_, player_transform) = player_query.single();
 
-    cam_transform.translation.x = player_transform.translation.x;
-    cam_transform.translation.y = player_transform.translation.y;
-}
+//     cam_transform.translation.x = player_transform.translation.x;
+//     cam_transform.translation.y = player_transform.translation.y;
+// }
