@@ -36,8 +36,8 @@ impl Plugin for PlayerPlugin {
             .add_event::<EdgeEvent>()
             .add_system(player_movement_system)
             .add_system(player_keyboard_event_system)
-            .add_system(animate_sprite_system)
-            .add_system(camera_follow);
+            .add_system(animate_sprite_system);
+        //.add_system(camera_follow);
         //.register_inspectable::<EdgeEvent>();
     }
 }
