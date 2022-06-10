@@ -9,7 +9,9 @@ edition = "2021"
 bevy = { version = "0.7" }   #, features = ["dynamic"] }
 bevy-inspector-egui = "0.11"
 rand = "0.8"
-ulam = "0.3.1"
+ulam = "0.4.1"
+awc = "3.0.0"
+actix-rt = "2.7.0"
 
 [profile.dev]
 opt-level = 1

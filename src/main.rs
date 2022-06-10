@@ -1,4 +1,5 @@
 //#![allow(clippy::redundant_field_names)]
+
 use bevy::{prelude::*, window::PresentMode};
 use block::BlockPlugin;
 use debug::DebugPlugin;
@@ -25,6 +26,7 @@ mod block;
 mod components;
 mod debug;
 mod player;
+mod web;
 
 //use debug::DebugPlugin;
 //use player::PlayerPlugin;
@@ -46,6 +48,7 @@ fn main() {
         .add_plugin(BlockPlugin)
         .add_startup_system(setup_system)
         .add_startup_system_to_stage(StartupStage::PreStartup, spritesheet_system)
+        .add_system(call_saul)
         //.add_startup_system_to_stage(StartupStage::PostStartup, player_spawn_system)
         //.add_plugin(PlayerPlugin)
         .add_plugin(DebugPlugin)
@@ -91,4 +94,28 @@ fn spritesheet_system(
         player: texture_atlas_handle, //asset_server.load(MAN_SPRITESHEET),
     };
     commands.insert_resource(game_textures);
+}
+
+// fn main() {
+//     let sys = actix::System::new("test");
+
+//     actix::Arbiter::handle().spawn({
+//         client::get("http://www.rust-lang.org") // <- Create request builder
+//             .header("User-Agent", "Actix-web")
+//             .finish()
+//             .unwrap()
+//             .send() // <- Send http request
+//             .map_err(|_| ())
+//             .and_then(|response| {
+//                 // <- server http response
+//                 println!("Response: {:?}", response);
+//                 Ok(())
+//             })
+//     });
+
+//     sys.run();
+// }
+
+fn call_saul() {
+    web::pg();
 }

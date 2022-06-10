@@ -48,7 +48,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands
         .spawn_bundle(Text2dBundle {
             text: Text::with_section(
-                ulam::get_ulam_deets(&c).value.to_string(),
+                ulam::get_ulam_point(&c).value.to_string(),
                 text_style,
                 text_alignment_topleft,
             ),
@@ -104,7 +104,7 @@ fn update_block_system(
             block.y = new_y;
 
             let c = Coord { x: new_x, y: new_y };
-            text.sections[0].value = ulam::get_ulam_deets(&c).value.to_string();
+            text.sections[0].value = ulam::get_ulam_point(&c).value.to_string();
             //println!("{}", &text.sections[0].value);
         }
     }

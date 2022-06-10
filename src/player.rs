@@ -233,11 +233,11 @@ fn animate_sprite_system(
                 }
                 Direction::Left => {
                     dir_indexes = player.left_animation_indexes.clone();
-                    sprite.flip_x = true;
+                    sprite.flip_x = false;
                 }
                 Direction::Right => {
                     dir_indexes = player.right_animation_indexes.clone();
-                    sprite.flip_x = false;
+                    sprite.flip_x = true;
                 }
             }
             if velocity.x == 0. && velocity.y == 0. {
