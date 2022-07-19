@@ -36,3 +36,6 @@ struct CollisionEvent;
 
 #[derive(Default, Inspectable)]
 struct Collider;
+
+#[derive(Component, Inspectable, Debug)]
+pub struct Counter(pub i32);

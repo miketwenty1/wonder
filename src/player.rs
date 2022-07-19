@@ -111,15 +111,6 @@ fn player_movement_system(
             edge_event.send(EdgeEvent(Edge::South));
             translation.y = 250.
         }
-        // only reflect if the ball's velocity is going in the opposite direction of the
-        // collision
-        // match translation.x,translation.y {
-        //     Collision::Left => reflect_x = ball_velocity.x > 0.0,
-        //     Collision::Right => reflect_x = ball_velocity.x < 0.0,
-        //     Collision::Top => reflect_y = ball_velocity.y < 0.0,
-        //     Collision::Bottom => reflect_y = ball_velocity.y > 0.0,
-        //     Collision::Inside => { /* do nothing */ }
-        // }
     }
 }
 
@@ -127,65 +118,6 @@ fn player_keyboard_event_system(
     kb: Res<Input<KeyCode>>,
     mut query: Query<&mut Velocity, With<Player>>,
 ) {
-    // const diagonal_velocity: f32 = 0.7071068;
-    //
-    //     let key = kb.get_pressed().last().unwrap_or_else(|| &KeyCode::P);
-    //     match key {
-    //         (KeyCode::Left | KeyCode::A) (KeyCode::Up | KeyCode::W) => velocity.x = -1.,
-    //         KeyCode::Right | KeyCode::D => velocity.x = 1.,
-    //         KeyCode::Up | KeyCode::W => velocity.y = 1.,
-    //         KeyCode::Down | KeyCode::S => velocity.y = -1.,
-    //         _ => (velocity.x, velocity.y) = (0., 0.),
-    //     }
-
-    // WORKS BUT IS VERY VERBOSE
-    // if let Ok(mut velocity) = query.get_single_mut() {
-    //     // diagonal NW
-    //     if (kb.pressed(KeyCode::Left) || kb.pressed(KeyCode::A))
-    //         && (kb.pressed(KeyCode::Up) || kb.pressed(KeyCode::W))
-    //     {
-    //         velocity.x = -diagonal_velocity;
-    //         velocity.y = diagonal_velocity;
-    //     // diagonal NE
-    //     } else if (kb.pressed(KeyCode::Right) || kb.pressed(KeyCode::D))
-    //         && (kb.pressed(KeyCode::Up) || kb.pressed(KeyCode::W))
-    //     {
-    //         velocity.x = diagonal_velocity;
-    //         velocity.y = diagonal_velocity;
-    //     // diagonal SW
-    //     } else if (kb.pressed(KeyCode::Left) || kb.pressed(KeyCode::A))
-    //         && (kb.pressed(KeyCode::Down) || kb.pressed(KeyCode::S))
-    //     {
-    //         velocity.x = -diagonal_velocity;
-    //         velocity.y = -diagonal_velocity;
-    //         // diagonal SE
-    //     } else if (kb.pressed(KeyCode::Right) || kb.pressed(KeyCode::D))
-    //         && (kb.pressed(KeyCode::Down) || kb.pressed(KeyCode::S))
-    //     {
-    //         velocity.x = diagonal_velocity;
-    //         velocity.y = -diagonal_velocity;
-    //         // N
-    //     } else if (kb.pressed(KeyCode::Up) || kb.pressed(KeyCode::W)) {
-    //         velocity.x = 0.;
-    //         velocity.y = 1.;
-    //         // S
-    //     } else if (kb.pressed(KeyCode::Down) || kb.pressed(KeyCode::S)) {
-    //         velocity.x = 0.;
-    //         velocity.y = -1.;
-    //         // E
-    //     } else if (kb.pressed(KeyCode::Right) || kb.pressed(KeyCode::D)) {
-    //         velocity.x = 1.;
-    //         velocity.y = 0.;
-    //         // W
-    //     } else if (kb.pressed(KeyCode::Left) || kb.pressed(KeyCode::A)) {
-    //         velocity.x = -1.;
-    //         velocity.y = 0.;
-    //         // None
-    //     } else {
-    //         velocity.x = 0.;
-    //         velocity.y = 0.;
-    //     }
-    // }
     if let Ok(mut velocity2) = query.get_single_mut() {
         let mut velocity = Vec3::ZERO;
         if kb.pressed(KeyCode::W) || kb.pressed(KeyCode::Up) {
@@ -233,11 +165,11 @@ fn animate_sprite_system(
                 }
                 Direction::Left => {
                     dir_indexes = player.left_animation_indexes.clone();
-                    sprite.flip_x = false;
+                    sprite.flip_x = true;
                 }
                 Direction::Right => {
                     dir_indexes = player.right_animation_indexes.clone();
-                    sprite.flip_x = true;
+                    sprite.flip_x = false;
                 }
             }
             if velocity.x == 0. && velocity.y == 0. {

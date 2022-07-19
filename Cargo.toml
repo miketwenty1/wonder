@@ -10,8 +10,12 @@ bevy = { version = "0.7" }   #, features = ["dynamic"] }
 bevy-inspector-egui = "0.11"
 rand = "0.8"
 ulam = "0.4.1"
-awc = "3.0.0"
-actix-rt = "2.7.0"
+# awc = "3.0.0"
+# actix-rt = "2.7.0"
+bevy-web-resizer = "2.0.0"
+ehttp = "0.2.0"
+serde_json = "1.0.82"
+wasm-bindgen = "0.2.81"
 
 [profile.dev]
 opt-level = 1

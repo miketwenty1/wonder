@@ -1,9 +1,12 @@
 //#![allow(clippy::redundant_field_names)]
 
 use bevy::{prelude::*, window::PresentMode};
+use bevy_web_resizer;
 use block::BlockPlugin;
+use components::Counter;
 use debug::DebugPlugin;
 use player::PlayerPlugin;
+
 //render::camera::ScalingMode
 pub const CLEAR: Color = Color::rgb(0.2, 0.2, 0.2);
 pub const RESOLUTION: f32 = 16.0 / 9.0;
@@ -32,9 +35,10 @@ mod web;
 //use player::PlayerPlugin;
 
 fn main() {
+    let mut num: i32 = 0;
     let height = 900.0;
-    App::new()
-        .insert_resource(ClearColor(CLEAR))
+    let mut app = App::new();
+    app.insert_resource(ClearColor(CLEAR))
         .insert_resource(WindowDescriptor {
             width: height * RESOLUTION,
             height: height,
@@ -48,12 +52,23 @@ fn main() {
         .add_plugin(BlockPlugin)
         .add_startup_system(setup_system)
         .add_startup_system_to_stage(StartupStage::PreStartup, spritesheet_system)
-        .add_system(call_saul)
-        //.add_startup_system_to_stage(StartupStage::PostStartup, player_spawn_system)
-        //.add_plugin(PlayerPlugin)
-        .add_plugin(DebugPlugin)
-        //.add_startup_system_to_stage(StartupStage::PreStartup, load_character_sprites)
-        .run();
+        // .add_system(call_saul)
+        .add_system(counter_system)
+        // .add_startup_system_to_stage(StartupStage::PostStartup, player_spawn_system)
+        // .add_plugin(PlayerPlugin)
+        .add_plugin(DebugPlugin);
+
+    #[cfg(target_arch = "wasm32")]
+    {
+        app.add_plugin(bevy_web_resizer::Plugin);
+    }
+
+    app.run()
+
+    //.add_plugin(bevy_web_resizer::Plugin)
+    //.add_startup_system_to_stage(StartupStage::PreStartup, load_character_sprites)
+
+    //app.run();
 }
 
 fn setup_system(mut commands: Commands, mut windows: ResMut<Windows>) {
@@ -71,6 +86,9 @@ fn setup_system(mut commands: Commands, mut windows: ResMut<Windows>) {
     let win_size = WinSize { w: win_w, h: win_h };
     commands.insert_resource(win_size);
     commands.spawn_bundle(OrthographicCameraBundle::new_2d());
+
+    let counter = Counter(0);
+    commands.spawn().insert(counter);
 }
 
 fn spritesheet_system(
@@ -116,6 +134,16 @@ fn spritesheet_system(
 //     sys.run();
 // }
 
-fn call_saul() {
-    web::pg();
+// fn call_saul() {
+
+// }
+
+fn counter_system(mut query: Query<&mut Counter>) {
+    for mut fieldd in query.iter_mut() {
+        fieldd.0 += 1;
+        if fieldd.0 % 100 == 0 {
+            println!("hello {}!", fieldd.0);
+            web::pg();
+        }
+    }
 }
