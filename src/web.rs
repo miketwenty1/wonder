@@ -1,13 +1,13 @@
 // use actix_rt::System;
 // use awc::Client;
 use serde_json::Value;
-use std::convert::TryInto;
+//use std::convert::TryInto;
 use wasm_bindgen::prelude::*;
 
-fn demo<T, const N: usize>(v: Vec<T>) -> [T; N] {
-    v.try_into()
-        .unwrap_or_else(|v: Vec<T>| panic!("Expected a Vec of length {} but it was {}", N, v.len()))
-}
+// fn demo<T, const N: usize>(v: Vec<T>) -> [T; N] {
+//     v.try_into()
+//         .unwrap_or_else(|v: Vec<T>| panic!("Expected a Vec of length {} but it was {}", N, v.len()))
+// }
 
 #[wasm_bindgen]
 extern "C" {
@@ -47,19 +47,25 @@ pub fn pg() {
     // });
 
     //println!()
-    let request = ehttp::Request::get("http://localhost:8081/hello/asdf");
+    let request = ehttp::Request::get("http://localhost:8081/hello/tidwell");
     ehttp::fetch(request, move |result: ehttp::Result<ehttp::Response>| {
         match result {
             Ok(res) => {
                 let bytes = res.bytes;
                 let v: Value = serde_json::from_slice(&bytes).unwrap();
                 println!("Status code: {:?}", &v);
-                console_log!("Hello you found an item {}!", &v.characters);
+                console_log!(
+                    "Hello you found an item {}!",
+                    &v["character"]["items"][1].as_str().unwrap()
+                );
             }
             Err(e) => {
                 //println!("Status code: {:?}", v);
                 //console::log_1(&"Hello using web-sys".into());
-                console_log!("Cant connect to server bro!");
+                console_log!(
+                    "Cant connect to server bro! please report this error: {}",
+                    e
+                );
             }
         }
 
