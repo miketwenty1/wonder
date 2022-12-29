@@ -61,13 +61,16 @@ pub fn bevy_app(user_token: String) {
             SystemSet::on_exit(AppState::PlayerSetup)
                 .with_system(player_setup_scene::cleanup_player_scene),
         )
-        .add_system_set(SystemSet::on_enter(AppState::InGame).with_system(game_scene::setup))
         .add_system_set(
-            SystemSet::on_update(AppState::InGame).with_system(game_scene::animate_sprite),
+            SystemSet::on_enter(AppState::InGame)
+                .with_system(game_scene::setup)
+                .with_system(game_scene::setup_comm),
         )
-        // .add_system(player_setup_scene::username_input)
-        // .add_system(player_setup_scene::start_button_system)
-        // .add_system(player_setup_scene::vkeyboard_system)
-        // .add_system(player_setup_scene::case_vkeyboard_system)
+        .add_system_set(
+            SystemSet::on_update(AppState::InGame)
+                .with_system(game_scene::animate_sprite)
+                .with_system(game_scene::api_sender)
+                .with_system(game_scene::api_receiver),
+        )
         .run();
 }
