@@ -45,10 +45,8 @@ pub fn bevy_app(user_token: String) {
             SystemSet::on_enter(AppState::PlayerSetup)
                 .with_system(player_setup_scene::setup_name_scene)
                 .with_system(player_setup_scene::setup_start_button)
-                .with_system(player_setup_scene::setup_core_stuff)
-                .with_system(
-                    player_setup_scene::setup_vkeyboard.after(player_setup_scene::setup_core_stuff),
-                ),
+                .with_system(player_setup_scene::setup_music)
+                .with_system(player_setup_scene::setup_vkeyboard),
         )
         .add_system_set(
             SystemSet::on_update(AppState::PlayerSetup)

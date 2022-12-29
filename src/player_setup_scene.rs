@@ -28,13 +28,13 @@ enum KeyType {
 #[derive(Resource)]
 pub struct PlayerTextEntity {
     input_prompt_text: Entity,
-    username: Entity,
+    pub username: Entity,
 }
 
-#[derive(Resource)]
-pub struct KeyboardEntity {
-    keyboard: Vec<Entity>,
-}
+// #[derive(Resource)]
+// pub struct KeyboardEntity {
+//     keyboard: Vec<Entity>,
+// }
 
 #[derive(Resource)]
 pub struct StartButtonEntity {
@@ -232,12 +232,7 @@ pub fn start_button_system(
     }
 }
 
-pub fn setup_core_stuff(asset_server: Res<AssetServer>, audio: Res<Audio>, mut commands: Commands) {
-    let e = commands.spawn_empty().id();
-    let vec_e: Vec<Entity> = [e].to_vec();
-
-    commands.insert_resource(KeyboardEntity { keyboard: vec_e });
-
+pub fn setup_music(asset_server: Res<AssetServer>, audio: Res<Audio>) {
     let music = asset_server.load("sounds/Windless Slopes.ogg");
     audio.play(music);
 }
