@@ -39,19 +39,15 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         transform: Transform::from_translation(box_position.extend(0.0)),
         ..default()
     });
-    let text_alignment_topleft = TextAlignment {
-        vertical: VerticalAlign::Center,
-        horizontal: HorizontalAlign::Center,
-    };
+    // let text_alignment_topleft = TextAlignment {
+    //     vertical: VerticalAlign::Center,
+    //     horizontal: HorizontalAlign::Center,
+    // };
     let c = Coord { x: 0, y: 0 };
 
     commands
         .spawn_bundle(Text2dBundle {
-            text: Text::with_section(
-                ulam::get_ulam_point(&c).value.to_string(),
-                text_style,
-                text_alignment_topleft,
-            ),
+            text: Text::from_section(ulam::get_ulam_point(&c).value.to_string(), text_style),
             // text_2d_bounds: Text2dBounds {
             //     // Wrap text in the rectangle
             //     size: box_size,

@@ -1,149 +1,73 @@
-//#![allow(clippy::redundant_field_names)]
+// use async_channel::{Receiver, Sender};
+// use bevy_inspector_egui::Inspectable;
 
-use bevy::{prelude::*, window::PresentMode};
-use bevy_web_resizer;
-use block::BlockPlugin;
-use components::Counter;
-use debug::DebugPlugin;
-use player::PlayerPlugin;
+use bevy::prelude::*;
+use wasm_bindgen::prelude::wasm_bindgen;
 
-//render::camera::ScalingMode
-pub const CLEAR: Color = Color::rgb(0.2, 0.2, 0.2);
-pub const RESOLUTION: f32 = 16.0 / 9.0;
-pub const TILE_SIZE: f32 = 0.2;
-pub const MAN_SPRITESHEET: &str = "mansprite3x3_gimp.png";
-pub const SPRITESHEET_SIZE: (f32, f32) = (96.0, 32.0);
-pub const SPRITE_SCALE: f32 = 4.;
+mod game_scene;
+mod player_setup_scene;
+#[wasm_bindgen]
+extern "C" {
 
-const TIME_STEP: f32 = 1. / 60.;
-const BASE_SPEED: f32 = 200.;
-pub struct WinSize {
-    pub w: f32,
-    pub h: f32,
+    #[wasm_bindgen(js_namespace = console)]
+    pub fn log(s: &str);
+
+    #[wasm_bindgen(js_namespace = console, js_name = log)]
+    pub fn log_u32(a: u32);
+
+    #[wasm_bindgen(js_namespace = console, js_name = log)]
+    pub fn log_many(a: &str, b: &str);
+
 }
 
-struct GameTextures {
-    player: Handle<TextureAtlas>,
+macro_rules! console_log {
+  ($($t:tt)*) => (log(&format_args!($($t)*).to_string()))
 }
-mod block;
-mod components;
-mod debug;
-mod player;
-mod web;
 
-//use debug::DebugPlugin;
-//use player::PlayerPlugin;
+#[derive(Debug, Clone, Eq, PartialEq, Hash)]
+pub enum AppState {
+    PlayerSetup,
+    InGame,
+}
 
 fn main() {
-    let mut num: i32 = 0;
-    let height = 900.0;
-    let mut app = App::new();
-    app.insert_resource(ClearColor(CLEAR))
-        .insert_resource(WindowDescriptor {
-            width: height * RESOLUTION,
-            height: height,
-            title: "Wonder".to_string(),
-            present_mode: PresentMode::Fifo,
-            resizable: false,
-            ..Default::default()
-        })
-        .add_plugins(DefaultPlugins)
-        .add_plugin(PlayerPlugin)
-        .add_plugin(BlockPlugin)
-        .add_startup_system(setup_system)
-        .add_startup_system_to_stage(StartupStage::PreStartup, spritesheet_system)
-        // .add_system(call_saul)
-        .add_system(counter_system)
-        // .add_startup_system_to_stage(StartupStage::PostStartup, player_spawn_system)
-        // .add_plugin(PlayerPlugin)
-        .add_plugin(DebugPlugin);
-
-    #[cfg(target_arch = "wasm32")]
-    {
-        app.add_plugin(bevy_web_resizer::Plugin);
-    }
-
-    app.run()
-
-    //.add_plugin(bevy_web_resizer::Plugin)
-    //.add_startup_system_to_stage(StartupStage::PreStartup, load_character_sprites)
-
-    //app.run();
+    bevy_app("asdfasdfa".to_string());
 }
 
-fn setup_system(mut commands: Commands, mut windows: ResMut<Windows>) {
-    // camera
-    // let mut camera = OrthographicCameraBundle::new_2d();
-    // camera.orthographic_projection.top = 1.0;
-    // camera.orthographic_projection.bottom = -1.0;
-    // camera.orthographic_projection.left = -1.0 * RESOLUTION;
-    // camera.orthographic_projection.right = 1.0 * RESOLUTION;
-
-    //camera.orthographic_projection.scaling_mode = ScalingMode::None;
-
-    let window = windows.get_primary_mut().unwrap();
-    let (win_w, win_h) = (window.width(), window.height());
-    let win_size = WinSize { w: win_w, h: win_h };
-    commands.insert_resource(win_size);
-    commands.spawn_bundle(OrthographicCameraBundle::new_2d());
-
-    let counter = Counter(0);
-    commands.spawn().insert(counter);
-}
-
-fn spritesheet_system(
-    mut commands: Commands,
-    asset_server: Res<AssetServer>,
-    mut texture_atlases: ResMut<Assets<TextureAtlas>>,
-) {
-    let texture_handle = asset_server.load(MAN_SPRITESHEET);
-    let texture_atlas = TextureAtlas::from_grid_with_padding(
-        texture_handle,
-        Vec2::new(32.0, 32.0),
-        3,
-        3,
-        Vec2::splat(2.0),
-    );
-    let texture_atlas_handle = texture_atlases.add(texture_atlas);
-
-    // commands.insert_resource(GameTextures(texture_atlas_handle));
-
-    let game_textures = GameTextures {
-        player: texture_atlas_handle, //asset_server.load(MAN_SPRITESHEET),
-    };
-    commands.insert_resource(game_textures);
-}
-
-// fn main() {
-//     let sys = actix::System::new("test");
-
-//     actix::Arbiter::handle().spawn({
-//         client::get("http://www.rust-lang.org") // <- Create request builder
-//             .header("User-Agent", "Actix-web")
-//             .finish()
-//             .unwrap()
-//             .send() // <- Send http request
-//             .map_err(|_| ())
-//             .and_then(|response| {
-//                 // <- server http response
-//                 println!("Response: {:?}", response);
-//                 Ok(())
-//             })
-//     });
-
-//     sys.run();
-// }
-
-// fn call_saul() {
-
-// }
-
-fn counter_system(mut query: Query<&mut Counter>) {
-    for mut fieldd in query.iter_mut() {
-        fieldd.0 += 1;
-        if fieldd.0 % 100 == 0 {
-            println!("hello {}!", fieldd.0);
-            web::pg();
-        }
-    }
+#[wasm_bindgen]
+pub fn bevy_app(user_token: String) {
+    console_log!("user: {}", user_token);
+    App::new()
+        .add_plugins(DefaultPlugins.set(ImagePlugin::default_nearest())) //.add_plugins(DefaultPlugins)
+        .add_state(AppState::PlayerSetup)
+        //.insert_resource(WinitSettings::game())
+        .add_system_set(
+            SystemSet::on_enter(AppState::PlayerSetup)
+                .with_system(player_setup_scene::setup_name_scene)
+                .with_system(player_setup_scene::setup_start_button)
+                .with_system(player_setup_scene::setup_core_stuff)
+                .with_system(
+                    player_setup_scene::setup_vkeyboard.after(player_setup_scene::setup_core_stuff),
+                ),
+        )
+        .add_system_set(
+            SystemSet::on_update(AppState::PlayerSetup)
+                .with_system(player_setup_scene::username_input)
+                .with_system(player_setup_scene::start_button_system)
+                .with_system(player_setup_scene::vkeyboard_system)
+                .with_system(player_setup_scene::case_vkeyboard_system),
+        )
+        .add_system_set(
+            SystemSet::on_exit(AppState::PlayerSetup)
+                .with_system(player_setup_scene::cleanup_player_scene),
+        )
+        .add_system_set(SystemSet::on_enter(AppState::InGame).with_system(game_scene::setup))
+        .add_system_set(
+            SystemSet::on_update(AppState::InGame).with_system(game_scene::animate_sprite),
+        )
+        // .add_system(player_setup_scene::username_input)
+        // .add_system(player_setup_scene::start_button_system)
+        // .add_system(player_setup_scene::vkeyboard_system)
+        // .add_system(player_setup_scene::case_vkeyboard_system)
+        .run();
 }

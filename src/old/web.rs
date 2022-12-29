@@ -34,30 +34,18 @@ macro_rules! console_log {
 }
 
 pub fn pg() {
-    // System::new().block_on(async {
-    //     let client = Client::default();
-
-    //     let res = client
-    //         .get("http://localhost:8080/hey")    // <- Create request builder
-    //         .insert_header(("User-Agent", "Actix-web"))
-    //         .send()                             // <- Send http request
-    //         .await;
-
-    //     println!("Response: {:?}", res);        // <- server http response
-    // });
-
-    //println!()
-    let request = ehttp::Request::get("http://localhost:8081/hello/tidwell");
+    let request = ehttp::Request::get("http://localhost:8081/easter");
     ehttp::fetch(request, move |result: ehttp::Result<ehttp::Response>| {
         match result {
             Ok(res) => {
                 let bytes = res.bytes;
                 let v: Value = serde_json::from_slice(&bytes).unwrap();
-                println!("Status code: {:?}", &v);
-                console_log!(
-                    "Hello you found an item {}!",
-                    &v["character"]["items"][1].as_str().unwrap()
-                );
+                println!("{:?}", &v);
+                // console_log!(
+                //     "Hello you found an item {}!",
+                //     &v["character"]["items"][1].as_str().unwrap()
+                // );
+                console_log!("{}", v);
             }
             Err(e) => {
                 //println!("Status code: {:?}", v);
