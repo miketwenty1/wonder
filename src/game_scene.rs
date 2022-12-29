@@ -87,6 +87,7 @@ pub fn setup_comm(mut commands: Commands) {
     commands.spawn(receiver_counter);
 }
 
+#[allow(unused)]
 pub fn api_sender(comm_channels: ResMut<CommChannels>, mut query: Query<&mut Counter>) {
     for mut fieldd in query.iter_mut() {
         if fieldd.c_name == "sender" {
@@ -96,7 +97,7 @@ pub fn api_sender(comm_channels: ResMut<CommChannels>, mut query: Query<&mut Cou
                 let pool = IoTaskPool::get();
                 let cc = comm_channels.tx.clone();
                 console_log!("sender_fn hit {} {}!", fieldd.c_name, fieldd.c);
-                let task = pool.spawn(async move {
+                let _task = pool.spawn(async move {
                     let api_response_text = reqwest::get("http://localhost:8081/blockheight")
                         .await
                         .unwrap()
