@@ -1,10 +1,22 @@
 // use async_channel::{Receiver, Sender};
 // use bevy_inspector_egui::Inspectable;
-
+use async_channel::{Receiver, Sender};
 use bevy::prelude::*;
+use bevy::tasks::IoTaskPool;
 use wasm_bindgen::prelude::wasm_bindgen;
+use wasm_bindgen_futures::JsFuture;
 
+use crate::AppQr;
 use crate::AppState;
+
+// #[derive(Resource, Clone)]
+// pub struct ClipboardChannel {
+//     pub tx: Sender<JsFuture>,
+//     pub rx: Receiver<String>,
+// }
+
+#[derive(Resource)]
+pub struct Counter(i32);
 
 #[derive(Debug, Clone, Eq, PartialEq, Hash, Component)]
 pub struct UsernameText(String);
@@ -69,13 +81,13 @@ macro_rules! console_log {
 
 pub fn setup_name_scene(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands.spawn(Camera2dBundle::default());
-
+    commands.insert_resource(Counter(0));
     let font = asset_server.load("fonts/FiraSans-Bold.ttf");
     let text_style = TextStyle {
         font,
         font_size: 60.0,
         color: Color::WHITE,
-    };
+    }; //directives: web_sys_unstable_apis is disabled
 
     let input_prompt_text = commands
         .spawn((Text2dBundle {
@@ -108,7 +120,10 @@ pub fn username_input(
     //mut string: Local<String>,
     mut username: Query<&mut Text, With<UsernameText>>,
     mut q_button: Query<&mut Visibility, With<StartButton>>,
+    mut counter: ResMut<Counter>,
 ) {
+    counter.0 += 1;
+    //info!("{}", counter.0);
     let user_string_result = username.get_single_mut();
     let mut user_string = match user_string_result {
         Ok(r) => r.sections[0].value.clone(),
@@ -126,14 +141,12 @@ pub fn username_input(
             }
         }
     }
-
     // if keys.just_pressed(KeyCode::Return) {
     //     console_log!("Text input: {}", *string);
     //     string.clear();
     // }
     if keys.just_pressed(KeyCode::Back) {
         console_log!("trying to delete a char");
-        user_string.pop();
     }
     let r_vis = q_button.get_single_mut();
 
@@ -232,11 +245,6 @@ pub fn start_button_system(
     }
 }
 
-pub fn setup_music(asset_server: Res<AssetServer>, audio: Res<Audio>) {
-    let music = asset_server.load("sounds/Windless Slopes.ogg");
-    audio.play(music);
-}
-
 pub fn setup_vkeyboard(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
@@ -251,7 +259,7 @@ pub fn setup_vkeyboard(
     //let mut loop_counter = 0;
     let reverse_x_by = [0.0, 520.0, 520.0, 430.0];
     let mut y_offset = 300.0;
-    let mut x_offset = 300.0;
+    let mut x_offset = 320.0;
 
     for (loop_counter, row) in key_chars.into_iter().enumerate() {
         x_offset -= reverse_x_by[loop_counter];
@@ -328,6 +336,8 @@ pub fn vkeyboard_system(
     //mut text_query: Query<&mut Text>,
     mut username: Query<&mut Text, With<UsernameText>>,
     mut c_toggle: Query<&mut CapitalizeToggle>,
+    mut state: ResMut<State<AppState>>,
+    mut qr_state: ResMut<State<AppQr>>,
 ) {
     let user_string_result = username.get_single_mut();
     let mut user_string = match user_string_result {
@@ -343,10 +353,31 @@ pub fn vkeyboard_system(
                 match k {
                     '<' => {
                         user_string.pop();
+                        qr_state.set(AppQr::Off).unwrap();
                     }
                     '^' => {
+                        use wasm_bindgen_futures::spawn_local;
+                        let _task = spawn_local(async move {
+                            let window = web_sys::window().expect("window"); // { obj: val };
+                            let nav = window.navigator().clipboard();
+                            match nav {
+                                Some(a) => {
+                                    let p = a
+                                        .write_text("please god workasdfasfasdfasdfasdfas33424232");
+                                    let result = wasm_bindgen_futures::JsFuture::from(p)
+                                        .await
+                                        .expect("clipboard populated");
+                                    info!("clippyboy worked");
+                                }
+                                None => {
+                                    warn!("failed to copy clippyboy");
+                                }
+                            };
+                        });
+
                         c_toggle.get_single_mut().unwrap().0 = !c_toggle.single_mut().0;
                         console_log!("capitalize is: {}", c_toggle.single_mut().0);
+                        qr_state.set(AppQr::Fifty).unwrap();
                     }
                     _ => {
                         if user_string.len() < USERNAME_LENGTH && ACCEPTABLE_CHARS.contains(k) {
@@ -446,3 +477,11 @@ pub fn clean_name(user_input: &str) -> &str {
         user_input
     }
 }
+
+// pub fn setup_overlay(mut state: ResMut<State<AppState>>) {
+
+// }
+
+// pub fn clean_overlay(mut state: ResMut<State<AppState>>) {
+//     state.pop().unwrap();
+// }
