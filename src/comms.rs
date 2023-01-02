@@ -3,10 +3,9 @@ use bevy::{prelude::*, tasks::IoTaskPool};
 
 use crate::{
     game_scene::Blockheight,
-    init_setup::ActixServerURI,
     qr_code_overlay_scene::CurrentQrString,
     sharedstructs::{BlockData, InvoiceData},
-    AppQr,
+    ActixServerURI, AppQr,
 };
 
 #[derive(Resource, Clone)]

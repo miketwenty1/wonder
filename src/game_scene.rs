@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use bevy::tasks::IoTaskPool;
 
 use crate::comms::InvoicePayChannel;
-use crate::init_setup::ActixServerURI;
+use crate::ActixServerURI;
 
 const NORMAL_BUTTON: Color = Color::rgb(0.15, 0.15, 0.15);
 const HOVERED_BUTTON: Color = Color::rgb(0.65, 0.25, 0.85);

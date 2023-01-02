@@ -25,12 +25,18 @@ pub enum AppQr {
     Fifty,
 }
 
+#[derive(Resource, Clone)]
+pub struct ActixServerURI(pub String);
+
 fn main() {
-    bevy_app("localtesting".to_string());
+    bevy_app(
+        "localtesting".to_string(),
+        "http://localhost:8081".to_string(),
+    );
 }
 
 #[wasm_bindgen]
-pub fn bevy_app(user_token: String) {
+pub fn bevy_app(user_token: String, server_url: String) {
     info!("user: {}", user_token);
     App::new()
         .add_plugins(
@@ -43,13 +49,13 @@ pub fn bevy_app(user_token: String) {
                 }),
         ) //.add_plugins(DefaultPlugins)
         .init_resource::<qr_code_overlay_scene::CurrentQrString>()
+        .insert_resource(ActixServerURI(server_url))
         .add_plugin(EguiPlugin)
         .add_state(AppState::PlayerSetup)
         .add_state(AppQr::Off)
         // .add_state(QrA::Fi)
         .add_system_set(
             SystemSet::on_enter(AppState::PlayerSetup)
-                .with_system(init_setup::setup)
                 .with_system(comms::setup_comm)
                 .with_system(player_setup_scene::setup_name_scene)
                 .with_system(player_setup_scene::setup_start_button)
