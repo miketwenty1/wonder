@@ -1,15 +1,24 @@
 use bevy::prelude::*;
+use bevy::tasks::IoTaskPool;
 
-fn main() {
-    App::new()
-        .add_plugins(DefaultPlugins.set(ImagePlugin::default_nearest())) // prevents blurry sprites
-        .add_startup_system(setup)
-        .add_system(animate_sprite)
-        .run();
-}
+use crate::comms::InvoicePayChannel;
+use crate::init_setup::ActixServerURI;
+
+const NORMAL_BUTTON: Color = Color::rgb(0.15, 0.15, 0.15);
+const HOVERED_BUTTON: Color = Color::rgb(0.65, 0.25, 0.85);
+const PRESSED_BUTTON: Color = Color::rgb(0.35, 0.75, 0.35);
+
+#[derive(Component)]
+pub struct PayButton;
+
+#[derive(Component)]
+pub struct InvoiceSVG(String);
 
 #[derive(Component, Deref, DerefMut)]
 pub struct AnimationTimer(Timer);
+
+#[derive(Component)]
+pub struct Blockheight(u32);
 
 pub fn animate_sprite(
     time: Res<Time>,
@@ -46,4 +55,104 @@ pub fn setup(
         },
         AnimationTimer(Timer::from_seconds(0.1, TimerMode::Repeating)),
     ));
+
+    let font = asset_server.load("fonts/FiraSans-Bold.ttf");
+    let text_style = TextStyle {
+        font,
+        font_size: 60.0,
+        color: Color::WHITE,
+    };
+
+    commands.spawn((
+        Text2dBundle {
+            text: Text::from_section("", text_style).with_alignment(TextAlignment::CENTER),
+            transform: Transform::from_xyz(0.0, 250.0, 2.0),
+            ..default()
+        },
+        Blockheight(0),
+    ));
+}
+
+pub fn setup_pay_button(mut commands: Commands, asset_server: Res<AssetServer>) {
+    trace!("very noisy");
+    debug!("helpful for debugging");
+    info!("helpful information that is worth printing by default");
+    warn!("something bad happened that isn't a failure, but thats worth calling out");
+    error!("something failed");
+    // ui camera
+    commands
+        .spawn((
+            ButtonBundle {
+                style: Style {
+                    size: Size::new(Val::Px(250.0), Val::Px(65.0)),
+                    // center button
+                    //margin: UiRect::all(Val::Percent(50.0)),
+                    // horizontally center child text
+                    justify_content: JustifyContent::Center,
+                    // vertically align inner child text
+                    align_items: AlignItems::Center,
+                    position_type: PositionType::Absolute,
+                    position: UiRect {
+                        top: Val::Px(250.0),
+                        left: Val::Px(362.0),
+                        ..default()
+                    },
+                    ..default()
+                },
+                background_color: NORMAL_BUTTON.into(),
+
+                ..default()
+            },
+            PayButton,
+        ))
+        .with_children(|parent| {
+            parent.spawn(TextBundle::from_section(
+                "Pay 50 sats",
+                TextStyle {
+                    font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                    font_size: 40.0,
+                    color: Color::rgb(0.9, 0.9, 0.9),
+                },
+            ));
+        });
+}
+
+#[allow(clippy::type_complexity)]
+#[allow(unused)]
+pub fn pay_button_system(
+    //mut state: ResMut<State<AppState>>,
+    mut interaction_query: Query<
+        (&Interaction, &mut BackgroundColor),
+        (Changed<Interaction>, With<PayButton>),
+    >,
+    comm_channel: ResMut<InvoicePayChannel>,
+    actix_server: Res<ActixServerURI>,
+) {
+    for (interaction, mut color) in &mut interaction_query {
+        match *interaction {
+            Interaction::Clicked => {
+                *color = PRESSED_BUTTON.into();
+                info!("creating invoice");
+                let sever = actix_server.clone().0;
+                let pool = IoTaskPool::get();
+                let cc = comm_channel.tx.clone();
+                let _task = pool.spawn(async move {
+                    let api_response_text = reqwest::get(format!("{}/invoice/50000", sever))
+                        .await
+                        .unwrap()
+                        .text()
+                        .await
+                        .unwrap();
+                    cc.try_send(api_response_text);
+                    //info!("debug invoice {}", api_response_text);
+                });
+            }
+            Interaction::Hovered => {
+                *color = HOVERED_BUTTON.into();
+            }
+            Interaction::None => {
+                *color = NORMAL_BUTTON.into();
+            }
+        }
+    }
 }
