@@ -1,17 +1,16 @@
-// use async_channel::{Receiver, Sender};
 // use bevy_inspector_egui::Inspectable;
 use bevy::prelude::*;
 use bevy_egui::EguiPlugin;
 
 use wasm_bindgen::prelude::wasm_bindgen;
 
+mod comms;
 mod game_scene;
+mod init_setup;
 mod player_setup_scene;
 mod qr_code_overlay_scene;
+mod sharedstructs;
 mod utils;
-
-//const SERVER_URL: &str = "https://satoshisettlers.com";
-const SERVER_URL: &str = "http://localhost:8081";
 
 #[derive(Debug, Clone, Eq, PartialEq, Hash)]
 pub enum AppState {
@@ -27,22 +26,8 @@ pub enum AppQr {
 }
 
 fn main() {
-    bevy_app("asdfasdfa".to_string());
-    //let a = web_sys::clip; //.write_text(sometext);
+    bevy_app("localtesting".to_string());
 }
-
-// fn copy_to_clipboard(&self) -> bool {
-//     if let Some(selected_text) = self.text_buffer.selected_text() {
-//         let navigator = web_sys::window(). .navigator();
-//         if let Some(clipboard) = navigator.clipboard() {
-//             let _ = clipboard.write_text(&selected_text);
-//             return true;
-//         } else {
-//             log::warn!("no navigator clipboard");
-//         }
-//     }
-//     false
-// }
 
 #[wasm_bindgen]
 pub fn bevy_app(user_token: String) {
@@ -57,13 +42,15 @@ pub fn bevy_app(user_token: String) {
                     ..default()
                 }),
         ) //.add_plugins(DefaultPlugins)
-        .init_resource::<qr_code_overlay_scene::CurrentQrCode>()
+        .init_resource::<qr_code_overlay_scene::CurrentQrString>()
         .add_plugin(EguiPlugin)
         .add_state(AppState::PlayerSetup)
         .add_state(AppQr::Off)
         // .add_state(QrA::Fi)
         .add_system_set(
             SystemSet::on_enter(AppState::PlayerSetup)
+                .with_system(init_setup::setup)
+                .with_system(comms::setup_comm)
                 .with_system(player_setup_scene::setup_name_scene)
                 .with_system(player_setup_scene::setup_start_button)
                 .with_system(utils::setup_music)
@@ -83,15 +70,13 @@ pub fn bevy_app(user_token: String) {
         .add_system_set(
             SystemSet::on_enter(AppState::InGame)
                 .with_system(game_scene::setup)
-                .with_system(game_scene::setup_pay_button)
-                .with_system(game_scene::setup_comm),
+                .with_system(game_scene::setup_pay_button),
         )
         .add_system_set(
             SystemSet::on_update(AppState::InGame)
-                //.with_system(utils::setup_music)
                 .with_system(game_scene::animate_sprite)
-                .with_system(game_scene::api_sender)
-                .with_system(game_scene::api_receiver)
+                .with_system(comms::api_height_sender)
+                .with_system(comms::api_receiver)
                 .with_system(game_scene::pay_button_system),
         )
         .add_system_set(

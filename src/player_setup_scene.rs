@@ -1,10 +1,5 @@
-// use async_channel::{Receiver, Sender};
-// use bevy_inspector_egui::Inspectable;
-use async_channel::{Receiver, Sender};
 use bevy::prelude::*;
-use bevy::tasks::IoTaskPool;
 use wasm_bindgen::prelude::wasm_bindgen;
-use wasm_bindgen_futures::JsFuture;
 
 use crate::AppQr;
 use crate::AppState;
@@ -336,7 +331,7 @@ pub fn vkeyboard_system(
     //mut text_query: Query<&mut Text>,
     mut username: Query<&mut Text, With<UsernameText>>,
     mut c_toggle: Query<&mut CapitalizeToggle>,
-    mut state: ResMut<State<AppState>>,
+    //mut state: ResMut<State<AppState>>,
     mut qr_state: ResMut<State<AppQr>>,
 ) {
     let user_string_result = username.get_single_mut();
@@ -356,25 +351,6 @@ pub fn vkeyboard_system(
                         qr_state.set(AppQr::Off).unwrap();
                     }
                     '^' => {
-                        use wasm_bindgen_futures::spawn_local;
-                        let _task = spawn_local(async move {
-                            let window = web_sys::window().expect("window"); // { obj: val };
-                            let nav = window.navigator().clipboard();
-                            match nav {
-                                Some(a) => {
-                                    let p = a
-                                        .write_text("please god workasdfasfasdfasdfasdfas33424232");
-                                    let result = wasm_bindgen_futures::JsFuture::from(p)
-                                        .await
-                                        .expect("clipboard populated");
-                                    info!("clippyboy worked");
-                                }
-                                None => {
-                                    warn!("failed to copy clippyboy");
-                                }
-                            };
-                        });
-
                         c_toggle.get_single_mut().unwrap().0 = !c_toggle.single_mut().0;
                         console_log!("capitalize is: {}", c_toggle.single_mut().0);
                         qr_state.set(AppQr::Fifty).unwrap();
