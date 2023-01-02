@@ -29,10 +29,10 @@ pub enum AppQr {
 pub struct ActixServerURI(pub String);
 
 fn main() {
-    bevy_app(
-        "localtesting".to_string(),
-        "http://localhost:8081".to_string(),
-    );
+    // bevy_app(
+    //     "localtesting".to_string(),
+    //     "http://localhost:8081".to_string(),
+    // );
 }
 
 #[wasm_bindgen]

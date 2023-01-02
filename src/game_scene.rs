@@ -133,11 +133,11 @@ pub fn pay_button_system(
             Interaction::Clicked => {
                 *color = PRESSED_BUTTON.into();
                 info!("creating invoice");
-                let sever = actix_server.clone().0;
+                let server = actix_server.clone().0;
                 let pool = IoTaskPool::get();
                 let cc = comm_channel.tx.clone();
                 let _task = pool.spawn(async move {
-                    let api_response_text = reqwest::get(format!("{}/invoice/50000", sever))
+                    let api_response_text = reqwest::get(format!("{}/invoice/50000", server))
                         .await
                         .unwrap()
                         .text()
