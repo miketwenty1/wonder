@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use bevy::tasks::IoTaskPool;
 
-use crate::character_components::Player;
+//use crate::character_components::Player;
 use crate::comms::InvoicePayChannel;
 use crate::{ActixServerURI, AppQr};
 
@@ -44,15 +44,15 @@ pub fn animate_sprite(
     }
 }
 
-pub fn player_system(mut player_q: Query<&mut Player>) {
-    // for (mut timer, mut sprite, texture_atlas_handle) in &mut query {
-    //     timer.tick(time.delta());
-    //     if timer.just_finished() {
-    //         let texture_atlas = texture_atlases.get(texture_atlas_handle).unwrap();
-    //         sprite.index = (sprite.index + 1) % texture_atlas.textures.len();
-    //     }
-    // }
-}
+// pub fn player_system(mut player_q: Query<&mut Player>) {
+//     // for (mut timer, mut sprite, texture_atlas_handle) in &mut query {
+//     //     timer.tick(time.delta());
+//     //     if timer.just_finished() {
+//     //         let texture_atlas = texture_atlases.get(texture_atlas_handle).unwrap();
+//     //         sprite.index = (sprite.index + 1) % texture_atlas.textures.len();
+//     //     }
+//     // }
+// }
 
 pub fn setup(
     mut commands: Commands,

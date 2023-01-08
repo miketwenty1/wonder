@@ -2,7 +2,6 @@ use bevy::prelude::*;
 use wasm_bindgen::prelude::wasm_bindgen;
 
 use crate::character_components::{Balance, Health, Location, Name, Player};
-use crate::AppQr;
 use crate::AppState;
 
 // #[derive(Resource, Clone)]
