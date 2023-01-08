@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use wasm_bindgen::prelude::wasm_bindgen;
 
-use crate::AppQr;
+use crate::character_components::{Balance, Health, Location, Name, Player};
 use crate::AppState;
 
 // #[derive(Resource, Clone)]
@@ -211,6 +211,7 @@ pub fn start_button_system(
     >,
     mut text_query: Query<&mut Text, Without<UsernameText>>,
     mut username: Query<&mut Text, With<UsernameText>>,
+    mut commands: Commands,
 ) {
     let user_string_result = username.get_single_mut();
     let user_string = match user_string_result {
@@ -225,7 +226,16 @@ pub fn start_button_system(
                 text.sections[0].value = "Start".to_string();
                 *color = PRESSED_BUTTON.into();
                 console_log!("start pressed");
-                console_log!("{}", clean_name(&user_string));
+                let clean_username = clean_name(&user_string);
+                console_log!("name selected: {}", clean_username);
+
+                commands.spawn((
+                    Player,
+                    Name(clean_username.to_string()),
+                    Balance(0),
+                    Health(10),
+                    Location(0),
+                ));
                 state.set(AppState::InGame).unwrap();
             }
             Interaction::Hovered => {
@@ -332,7 +342,6 @@ pub fn vkeyboard_system(
     mut username: Query<&mut Text, With<UsernameText>>,
     mut c_toggle: Query<&mut CapitalizeToggle>,
     //mut state: ResMut<State<AppState>>,
-    mut qr_state: ResMut<State<AppQr>>,
 ) {
     let user_string_result = username.get_single_mut();
     let mut user_string = match user_string_result {
@@ -348,12 +357,10 @@ pub fn vkeyboard_system(
                 match k {
                     '<' => {
                         user_string.pop();
-                        qr_state.set(AppQr::Off).unwrap();
                     }
                     '^' => {
                         c_toggle.get_single_mut().unwrap().0 = !c_toggle.single_mut().0;
                         console_log!("capitalize is: {}", c_toggle.single_mut().0);
-                        qr_state.set(AppQr::Fifty).unwrap();
                     }
                     _ => {
                         if user_string.len() < USERNAME_LENGTH && ACCEPTABLE_CHARS.contains(k) {

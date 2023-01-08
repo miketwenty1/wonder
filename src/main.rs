@@ -4,6 +4,7 @@ use bevy_egui::EguiPlugin;
 
 use wasm_bindgen::prelude::wasm_bindgen;
 
+mod character_components;
 mod comms;
 mod game_scene;
 mod init_setup;
@@ -22,7 +23,7 @@ pub enum AppState {
 #[derive(Debug, Clone, Eq, PartialEq, Hash)]
 pub enum AppQr {
     Off,
-    Fifty,
+    Fifty(i32),
 }
 
 #[derive(Resource, Clone)]
@@ -86,13 +87,15 @@ pub fn bevy_app(user_token: String, server_url: String) {
                 .with_system(game_scene::pay_button_system),
         )
         .add_system_set(
-            SystemSet::on_enter(AppQr::Fifty).with_system(qr_code_overlay_scene::setup_qr),
+            SystemSet::on_enter(AppQr::Fifty(50)).with_system(qr_code_overlay_scene::setup_qr),
         )
         .add_system_set(
-            SystemSet::on_update(AppQr::Fifty).with_system(qr_code_overlay_scene::update_qr),
+            SystemSet::on_update(AppQr::Fifty(50))
+                .with_system(qr_code_overlay_scene::update_qr)
+                .with_system(comms::api_check_invoice_sender), //.with_system(qr_code_overlay_scene::recv_check_qr_paid),
         )
         .add_system_set(
-            SystemSet::on_exit(AppQr::Fifty).with_system(qr_code_overlay_scene::clean_qr),
+            SystemSet::on_exit(AppQr::Fifty(50)).with_system(qr_code_overlay_scene::clean_qr),
         )
         .run();
 }
