@@ -15,12 +15,9 @@ pub struct CurrentQrString(pub String);
 // pub struct ClippyBoy;
 
 pub fn setup_qr(mut commands: Commands, qrcode_str: ResMut<CurrentQrString>) {
-    //let qrdata = "LNBC20N1P36A7LPPP5UC2ZSMMZQU6ZEH8XW54MY6997EU8XYYKM25Y0EPLC09H9M53KC9QDQVTFZ5Y32YG4ZSCQZPGXQZJCSP5VH36CEYL3CRHC7KF0WWMVXAJJ2S4J50NV40DZV7VUMKKGYRZU80Q9QYYSSQW3380SLJFCJ2RSEHPLTAR57VRUYWN8YPJJQFTU8DC56NC36ST3USKHGVJJQJLKHN7AKKDPR8KALH74SLETQDUT8R02EH96LTPG4Y5LCQDFKTJ7";
-
-    //qrcode_str.0 = qrdata.to_string();
-    info!("{}", qrcode_str.0);
+    info!("current qr code during setup: {}", qrcode_str.0);
     let code = QrCode::with_version(&qrcode_str.0, Version::Normal(9), EcLevel::L).unwrap();
-    //
+
     let image = code
         .render::<svg::Color>()
         .min_dimensions(200, 200)
@@ -82,15 +79,19 @@ pub fn update_qr(
     });
 }
 
+//pub fn recv_check_qr_paid() {}
+
 pub fn clean_qr(// qr: Res<MyQr>,
     // mut egui_context: ResMut<EguiContext>,
-    // mut qrcode_str: ResMut<CurrentQrCode>,
+    //mut qrcode_str: ResMut<CurrentQrCode>,
 ) {
+    // let a =  egui::Window::new("qrcode").show(ctx, add_contents);
     // egui::Window::new("qrcode").show(egui_context.ctx_mut(), |ui| {
     //     // Size to smallest square to preserve dimensions
-    //     let bevy_egui::egui::Vec2 { x, y } = ui.available_size();
-    //     let smaller = x.min(y);
-    //     qr.0.show_size(ui, bevy_egui::egui::Vec2::new(smaller, smaller));
+    //     //let bevy_egui::egui::Vec2 { x, y } = ui.available_size();
+    //     //let smaller = x.min(y);
+    //     // qr.0 //show_size(ui, bevy_egui::egui::Vec2::new(smaller, smaller));
+    //     ui.
     // });
 }
 

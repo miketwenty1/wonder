@@ -13,3 +13,8 @@ pub struct BlockData {
 pub struct InvoiceData {
     pub invoice: String,
 }
+
+#[derive(Debug, Serialize, Validate, Deserialize)]
+pub struct InvoiceCheck {
+    pub invoice_status: String,
+}
