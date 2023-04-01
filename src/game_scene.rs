@@ -162,7 +162,7 @@ pub fn pay_button_system(
                     info!("Weird, are you sure there's not already a qr code available to pay?");
                 } else {
                     // check to see if button qr is loading
-                    if button.loading == false {
+                    if !button.loading {
                         button.loading = true;
                         *color = PRESSED_BUTTON.into();
                         info!("creating invoice");
